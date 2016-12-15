@@ -1,0 +1,1 @@
+web: gunicorn runserver:app --workers $WEB_CONCURRENCY --preload --timeout 10 --max-requests 1200
