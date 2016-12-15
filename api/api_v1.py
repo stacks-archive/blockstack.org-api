@@ -8,6 +8,7 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import Timeout as RequestsTimeout
 
 from . import app
+from .settings import SLACK_API_TOKEN
 
 
 class APIError(Exception):
@@ -63,8 +64,11 @@ def get_slack_users():
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
     resp_data = json.loads(resp.text)
-    user_count = len(resp_data.get("members", 0))
+    print resp_data
+    print resp_data.get("members", [])
+    user_count = len(resp_data.get("members", []))
     resp = {
         "user_count": user_count
     }
     return jsonify(resp), 200
+

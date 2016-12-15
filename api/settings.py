@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 
 def get_settings_from_heroku(app_name):
