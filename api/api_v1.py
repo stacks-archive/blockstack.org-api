@@ -53,7 +53,17 @@ def get_blog_rss():
         resp = requests.get("https://blockstack.ghost.io/rss/")
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
-    return Response(resp.text, mimetype='text/xml')
+
+    rss_text = resp.text
+
+    rss_text = rss_text.replace(
+        "<link>https://blockstack.ghost.io/",
+        "<link>https://blockstack.org/blog/")
+    rss_text = rss_text.replace(
+        "href=\"https://blockstack.ghost.io/rss/\"",
+        "href=\"https://blockstack-site-api.herokuapp.com/v1/blog-rss\"")
+
+    return Response(rss_text, mimetype='text/xml')
 
 
 @app.route('/v1/slack-users', methods=['GET'])
