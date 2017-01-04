@@ -50,7 +50,7 @@ def index():
 @crossdomain(origin='*')
 def get_blog_rss():
     try:
-        resp = requests.get("http://the-blockstack-blog.ghost.io/rss/")
+        resp = requests.get("https://blockstack.ghost.io/rss/")
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
     return Response(resp.text, mimetype='text/xml')
