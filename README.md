@@ -1,5 +1,7 @@
 # Blockstack.org API
 
+[![Slack](http://chat.blockstack.org/badge.svg)](http://chat.blockstack.org/)
+
 Here's how to run a local instance of the API:
 
 1. Clone this repo
