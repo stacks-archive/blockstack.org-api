@@ -57,6 +57,9 @@ def get_blog_rss():
     rss_text = resp.text
 
     rss_text = rss_text.replace(
+        "http://blockstack.ghost.io/content/images/",
+        "https://blockstack.ghost.io/content/images/")
+    rss_text = rss_text.replace(
         "<link>https://blockstack.ghost.io/",
         "<link>https://blockstack.org/blog/")
     rss_text = rss_text.replace(
