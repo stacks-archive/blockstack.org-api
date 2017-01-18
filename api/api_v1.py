@@ -1,8 +1,7 @@
+import re
 import json
-
 from flask import request, Response, jsonify
 from flask_crossdomain import crossdomain
-
 import requests
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import Timeout as RequestsTimeout
@@ -40,7 +39,10 @@ def index():
     resp = {
         "routes": [
             '/v1/blog-rss',
-            '/v1/slack-users'
+            '/v1/slack-users',
+            '/v1/forum-users',
+            '/v1/meetup-users',
+            '/v1/stats'
         ]
     }
     return jsonify(resp), 200
@@ -76,12 +78,69 @@ def get_slack_users():
         resp = requests.get('https://slack.com/api/users.list?token=' + SLACK_API_TOKEN)
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
+    
     resp_data = json.loads(resp.text)
-    print resp_data
-    print resp_data.get("members", [])
     user_count = len(resp_data.get("members", []))
-    resp = {
+    
+    return jsonify({
         "user_count": user_count
-    }
-    return jsonify(resp), 200
+    }), 200
 
+
+@app.route('/v1/forum-users', methods=['GET'])
+@crossdomain(origin='*')
+def get_forum_users():
+    user_count = 0
+
+    try:
+        resp = requests.get('https://forum.blockstack.org/groups/trust_level_0.json')
+    except (RequestsConnectionError, RequestsTimeout) as e:
+        raise APIError()
+
+    resp_data = json.loads(resp.text)
+    if "basic_group" in resp_data:
+        basic_group = resp_data["basic_group"]
+        if "user_count" in basic_group:
+            user_count = basic_group["user_count"]
+
+    return jsonify({
+        "user_count": user_count
+    }), 200
+
+
+@app.route('/v1/meetup-users', methods=['GET'])
+@crossdomain(origin='*')
+def get_meetup_users():
+    user_count = 0
+
+    try:
+        resp = requests.get('https://www.meetup.com/topics/blockstack/')
+    except (RequestsConnectionError, RequestsTimeout) as e:
+        raise APIError()
+
+    html = resp.text
+    pattern = re.compile("<p class=\"text--bold\">(.*)</p>")
+    matches = pattern.findall(html)
+
+    if len(matches):
+        user_count = int(matches[0].replace(',', ''))
+
+    return jsonify({
+        "user_count": user_count
+    }), 200
+
+
+@app.route('/v1/stats', methods=['GET'])
+@crossdomain(origin='*')
+def get_stats():
+    slack_users = json.loads(get_slack_users().response[0])['user_count']
+    forum_users = json.loads(get_forum_users().response[0])['user_count']
+    meetup_users = json.loads(get_meetup_users().response[0])['user_count']
+
+    resp = {
+        "slack_users": slack_users,
+        "forum_users": forum_users,
+        "meetup_users": meetup_users
+    }
+
+    return jsonify(resp), 200
