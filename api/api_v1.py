@@ -39,6 +39,7 @@ def index():
     resp = {
         "routes": [
             '/v1/blog-rss',
+            '/v1/domain-stats',
             '/v1/slack-users',
             '/v1/forum-users',
             '/v1/meetup-users',
@@ -69,6 +70,25 @@ def get_blog_rss():
         "href=\"https://blockstack-site-api.herokuapp.com/v1/blog-rss\"")
 
     return Response(rss_text, mimetype='text/xml')
+
+
+@app.route('/v1/domain-stats', methods=['GET'])
+@crossdomain(origin='*')
+def get_domain_stats():
+    user_count = 0
+
+    try:
+        resp = requests.get("https://explorer-api.appartisan.com/get_num_names_in_namespace/id")
+    except (RequestsConnectionError, RequestsTimeout) as e:
+        raise APIError()
+
+    resp_data = json.loads(resp.text)
+    if "count" in resp_data:
+        user_count = resp_data["count"]
+
+    return jsonify({
+        "domain_count": user_count
+    }), 200
 
 
 @app.route('/v1/slack-users', methods=['GET'])
@@ -136,11 +156,13 @@ def get_stats():
     slack_users = json.loads(get_slack_users().response[0])['user_count']
     forum_users = json.loads(get_forum_users().response[0])['user_count']
     meetup_users = json.loads(get_meetup_users().response[0])['user_count']
+    domains = json.loads(get_domain_stats().response[0])['domain_count']
 
     resp = {
         "slack_users": slack_users,
         "forum_users": forum_users,
-        "meetup_users": meetup_users
+        "meetup_users": meetup_users,
+        "domains": domains
     }
 
     return jsonify(resp), 200
