@@ -99,7 +99,11 @@ def get_slack_users():
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
     
-    resp_data = json.loads(resp.text)
+    try:
+        resp_data = json.loads(resp.text)
+    except ValueError:
+        raise APIError("Invalid response from Slack")
+
     user_count = len(resp_data.get("members", []))
     
     return jsonify({
@@ -153,10 +157,26 @@ def get_meetup_users():
 @app.route('/v1/stats', methods=['GET'])
 @crossdomain(origin='*')
 def get_stats():
-    slack_users = json.loads(get_slack_users().response[0])['user_count']
-    forum_users = json.loads(get_forum_users().response[0])['user_count']
-    meetup_users = json.loads(get_meetup_users().response[0])['user_count']
-    domains = json.loads(get_domain_stats().response[0])['domain_count']
+    slack_users = forum_users = meetup_users = domains = 0
+    try:
+        slack_users = json.loads(get_slack_users().response[0])['user_count']
+    except:
+        pass
+
+    try:
+        forum_users = json.loads(get_forum_users().response[0])['user_count']
+    except:
+        pass
+
+    try:
+        meetup_users = json.loads(get_meetup_users().response[0])['user_count']
+    except:
+        pass
+
+    try:
+        domains = json.loads(get_domain_stats().response[0])['domain_count']
+    except:
+        pass
 
     resp = {
         "slack_users": slack_users,
