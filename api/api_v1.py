@@ -71,6 +71,18 @@ def get_blog_rss():
 
     return Response(rss_text, mimetype='text/xml')
 
+@app.route('/v1/prices', methods=['GET'])
+@crossdomain(origin='*')
+def get_prices():
+    try:
+        resp = requests.get("https://api.coinmarketcap.com/v1/ticker/?limit=20")
+    except (RequestsConnectionError, RequestsTimeout) as e:
+        raise APIError()
+
+    resp_data = json.loads(resp.text)
+
+    return jsonify(resp_data), 200
+
 
 @app.route('/v1/domain-stats', methods=['GET'])
 @crossdomain(origin='*')
