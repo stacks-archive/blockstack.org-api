@@ -59,7 +59,7 @@ def get_blog_rss():
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
 
-    if resp.status_code:
+    if resp.status_code == 404:
         return Response("", mimetype='text/xml')
 
     rss_text = resp.text
