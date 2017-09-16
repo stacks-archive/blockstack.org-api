@@ -52,10 +52,15 @@ def index():
 @app.route('/v1/blog-rss', methods=['GET'])
 @crossdomain(origin='*')
 def get_blog_rss():
+    page_number = request.args.get('page') or '1'
+
     try:
-        resp = requests.get("https://blockstack.ghost.io/rss/")
+        resp = requests.get("https://blockstack.ghost.io/rss/" + page_number)
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
+
+    if resp.status_code:
+        return Response("", mimetype='text/xml')
 
     rss_text = resp.text
 
