@@ -95,13 +95,13 @@ def get_domain_stats():
     user_count = 0
 
     try:
-        resp = requests.get("https://explorer-api.appartisan.com/get_num_names_in_namespace/id")
+        resp = requests.get("https://core.blockstack.org/v1/blockchains/bitcoin/name_count")
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
 
     resp_data = json.loads(resp.text)
-    if "count" in resp_data:
-        user_count = resp_data["count"]
+    if "names_count" in resp_data:
+        user_count = resp_data["names_count"]
 
     return jsonify({
         "domain_count": user_count
