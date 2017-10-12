@@ -73,8 +73,9 @@ def get_blog_rss():
     rss_text = rss_text.replace(
         "href=\"https://blockstack.ghost.io/rss/\"",
         "href=\"https://blockstack-site-api.herokuapp.com/v1/blog-rss\"")
-
-    return Response(rss_text, mimetype='text/xml')
+    new_response = Response(rss_text, mimetype='text/xml')
+    new_response.headers['Cache-Control'] = 'public, max-age=300'
+    return new_response
 
 @app.route('/v1/prices', methods=['GET'])
 @crossdomain(origin='*')
@@ -125,7 +126,7 @@ def get_slack_users():
 
     return jsonify({
         "user_count": user_count
-    }), 200
+    }), 200, {'Cache-Control': 'public, max-age=300'}
 
 
 @app.route('/v1/forum-users', methods=['GET'])
@@ -146,7 +147,7 @@ def get_forum_users():
 
     return jsonify({
         "user_count": user_count
-    }), 200
+    }), 200, {'Cache-Control': 'public, max-age=300'}
 
 
 @app.route('/v1/meetup-users', methods=['GET'])
@@ -168,7 +169,7 @@ def get_meetup_users():
 
     return jsonify({
         "user_count": user_count
-    }), 200
+    }), 200, {'Cache-Control': 'public, max-age=300'}
 
 
 @app.route('/v1/stats', methods=['GET'])
@@ -202,4 +203,4 @@ def get_stats():
         "domains": domains
     }
 
-    return jsonify(resp), 200
+    return jsonify(resp), 200, {'Cache-Control': 'public, max-age=300'}
