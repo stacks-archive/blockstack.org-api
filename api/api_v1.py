@@ -105,7 +105,7 @@ def get_domain_stats():
 
     return jsonify({
         "domain_count": user_count
-    }), 200
+    }), 200, {'Cache-Control': 'public, max-age=300'}
 
 
 @app.route('/v1/slack-users', methods=['GET'])
@@ -115,14 +115,14 @@ def get_slack_users():
         resp = requests.get('https://slack.com/api/users.list?token=' + SLACK_API_TOKEN)
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
-    
+
     try:
         resp_data = json.loads(resp.text)
     except ValueError:
         raise APIError("Invalid response from Slack")
 
     user_count = len(resp_data.get("members", []))
-    
+
     return jsonify({
         "user_count": user_count
     }), 200
