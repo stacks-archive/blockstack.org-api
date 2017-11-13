@@ -95,7 +95,7 @@ def get_domain_stats():
     user_count = 0
 
     try:
-        resp = requests.get("https://core.blockstack.org/v1/blockchains/bitcoin/name_count")
+        resp = requests.get("https://core.blockstack.org/v1/blockchains/bitcoin/name_count?all=1")
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
 
