@@ -55,7 +55,7 @@ def get_blog_rss():
     page_number = request.args.get('page') or '1'
 
     try:
-        resp = requests.get("https://blockstack.ghost.io/rss/" + page_number)
+        resp = requests.get("https://blockstack.ghost.io/3af438d4e779e6e1e92457ebbad60f/rss/" + page_number)
     except (RequestsConnectionError, RequestsTimeout) as e:
         raise APIError()
 
